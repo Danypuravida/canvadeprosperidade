@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas de Identidade — Danielle Gomes</title>
+  <style>
+    :root {
+      --bg-1: #f9efe7;
+      --bg-2: #fff7ed;
+      --terra: #a8552a;
+      --terracota: #c66a3d;
+      --vinho: #6f2437;
+      --dourado: #c9954a;
+      --verde: #476b4f;
+      --azul: #365a6d;
+      --ameixa: #5b3b63;
+      --texto: #2d211d;
+      --suave: #fffaf5;
+      --card: rgba(255, 250, 245, 0.88);
+      --sombra: 0 20px 45px rgba(72, 39, 24, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: var(--texto);
+      background:
+        radial-gradient(circle at top left, rgba(198, 106, 61, 0.22), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(71, 107, 79, 0.20), transparent 34%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      min-height: 100vh;
+      padding: 40px 18px;
+    }
+
+    .page {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.42);
+      border: 1px solid rgba(111, 36, 55, 0.15);
+      border-radius: 34px;
+      box-shadow: var(--sombra);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(120deg, rgba(201, 149, 74, 0.10) 0 1px, transparent 1px 100%),
+        linear-gradient(30deg, rgba(111, 36, 55, 0.07) 0 1px, transparent 1px 100%);
+      background-size: 34px 34px;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      padding: 56px 56px 28px;
+      text-align: center;
+      background:
+        linear-gradient(135deg, rgba(111, 36, 55, 0.95), rgba(168, 85, 42, 0.92)),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.24), transparent 35%);
+      color: #fffaf5;
+    }
+
+    .eyebrow {
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      font-size: 13px;
+      opacity: 0.86;
+      margin-bottom: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: 0.96;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 18px auto 0;
+      max-width: 780px;
+      font-family: Arial, sans-serif;
+      font-size: clamp(16px, 2.2vw, 21px);
+      line-height: 1.55;
+      opacity: 0.94;
+    }
+
+    .hero-phrase {
+      margin: 32px auto 4px;
+      max-width: 920px;
+      padding: 30px 28px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(255, 250, 245, 0.98), rgba(255, 235, 214, 0.96));
+      color: var(--vinho);
+      box-shadow: 0 18px 36px rgba(45, 33, 29, 0.22);
+      border: 2px solid rgba(201, 149, 74, 0.75);
+    }
+
+    .hero-phrase strong {
+      display: block;
+      font-size: clamp(26px, 5vw, 56px);
+      line-height: 1.03;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-phrase span {
+      display: block;
+      margin-top: 16px;
+      font-family: Arial, sans-serif;
+      color: var(--texto);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    main {
+      position: relative;
+      padding: 38px 42px 54px;
+    }
+
+    .intro {
+      max-width: 860px;
+      margin: 0 auto 32px;
+      text-align: center;
+      font-size: 21px;
+      line-height: 1.65;
+      color: #3f2d27;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 26px;
+      padding: 26px 24px;
+      min-height: 246px;
+      border: 1px solid rgba(45, 33, 29, 0.08);
+      box-shadow: 0 14px 30px rgba(72, 39, 24, 0.10);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: var(--accent);
+    }
+
+    .card h2 {
+      margin: 10px 0 16px;
+      font-size: 25px;
+      color: var(--title);
+      line-height: 1.1;
+    }
+
+    .card p,
+    .card li {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      margin: 0 0 10px;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 19px;
+    }
+
+    .card.identity { --accent: linear-gradient(90deg, #6f2437, #c9954a); --title: #6f2437; }
+    .card.mind { --accent: linear-gradient(90deg, #365a6d, #7d9aa8); --title: #365a6d; }
+    .card.leadership { --accent: linear-gradient(90deg, #476b4f, #c9954a); --title: #476b4f; }
+    .card.work { --accent: linear-gradient(90deg, #a8552a, #d98b5d); --title: #a8552a; }
+    .card.pressure { --accent: linear-gradient(90deg, #5b3b63, #b58abd); --title: #5b3b63; }
+    .card.life { --accent: linear-gradient(90deg, #c9954a, #f1c27b); --title: #8b5b1d; }
+
+    .wide {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 26px;
+      align-items: stretch;
+      margin-top: 6px;
+    }
+
+    .manifesto {
+      background: linear-gradient(135deg, rgba(71, 107, 79, 0.95), rgba(54, 90, 109, 0.95));
+      color: #fffaf5;
+      border-radius: 30px;
+      padding: 34px;
+      box-shadow: 0 16px 34px rgba(45, 33, 29, 0.18);
+    }
+
+    .manifesto h2 {
+      margin: 0 0 18px;
+      font-size: 34px;
+    }
+
+    .manifesto p {
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.68;
+      margin: 0 0 12px;
+    }
+
+    .pillars {
+      background: rgba(255, 250, 245, 0.9);
+      border-radius: 30px;
+      padding: 30px;
+      border: 1px solid rgba(111, 36, 55, 0.12);
+      box-shadow: 0 16px 34px rgba(72, 39, 24, 0.10);
+    }
+
+    .pillars h2 {
+      margin: 0 0 18px;
+      color: var(--vinho);
+      font-size: 34px;
+    }
+
+    .pillar-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .pillar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.35;
+      padding: 12px 14px;
+      background: rgba(255, 239, 226, 0.72);
+      border-radius: 16px;
+      border: 1px solid rgba(198, 106, 61, 0.15);
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      background: var(--dot);
+    }
+
+    .quote-bottom {
+      margin-top: 34px;
+      text-align: center;
+      padding: 30px 22px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(111, 36, 55, 0.10), rgba(201, 149, 74, 0.20));
+      border: 1px solid rgba(201, 149, 74, 0.32);
+    }
+
+    .quote-bottom p {
+      margin: 0;
+      font-size: clamp(24px, 3.5vw, 42px);
+      color: var(--vinho);
+      font-weight: 700;
+      line-height: 1.12;
+    }
+
+    .quote-bottom span {
+      display: block;
+      margin-top: 12px;
+      font-family: Arial, sans-serif;
+      font-size: 17px;
+      color: #4a3830;
+    }
+
+    footer {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: rgba(45, 33, 29, 0.70);
+      padding: 0 32px 34px;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        padding: 42px 24px 24px;
+      }
+      main {
+        padding: 28px 20px 42px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .wide {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        min-height: auto;
+      }
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: #fff7ed;
+      }
+      .page {
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .card, .manifesto, .pillars, .hero-phrase {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="eyebrow">Canvas de Identidade Profissional</div>
+      <h1>Danielle Gomes</h1>
+      <p class="subtitle">Supervisora de Operações Ingresse — BFR. Liderança, desenvolvimento de pessoas, processos, indicadores e resultado.</p>
+
+      <section class="hero-phrase" aria-label="Frase central">
+        <strong>Eu parei de me mover por motivação.</strong>
+        <strong>Eu me movo por objetivos.</strong>
+        <span>Motivação oscila. Objetivos permanecem.</span>
+      </section>
+    </header>
+
+    <main>
+      <p class="intro">
+        Sou uma mulher que assume responsabilidades, constrói soluções e cresce através dos desafios. Eu me posiciono com clareza, domino minhas emoções e escolho agir mesmo quando ainda não me sinto pronta.
+      </p>
+
+      <section class="grid">
+        <article class="card identity">
+          <h2>Quem eu sou</h2>
+          <p>Sou Danielle Gomes. Uma profissional comprometida com meu próprio crescimento, com a excelência da operação e com a vida que estou construindo.</p>
+          <p>Eu mereço ocupar os espaços que conquisto com trabalho, disciplina e evolução.</p>
+        </article>
+
+        <article class="card mind">
+          <h2>Como eu penso</h2>
+          <ul>
+            <li>Eu observo minhas emoções sem ser governada por elas.</li>
+            <li>Eu não foco nas justificativas; busco resultados.</li>
+            <li>Eu aprendo o que ainda não sei.</li>
+            <li>Eu sustento o desconforto necessário para crescer.</li>
+          </ul>
+        </article>
+
+        <article class="card leadership">
+          <h2>Como eu lidero</h2>
+          <ul>
+            <li>Comunico com clareza, racionalidade e respeito.</li>
+            <li>Dou feedbacks difíceis quando necessário.</li>
+            <li>Reconheço, elogio e desenvolvo pessoas.</li>
+            <li>Sou firme sem perder humanidade.</li>
+          </ul>
+        </article>
+
+        <article class="card work">
+          <h2>Como eu trabalho</h2>
+          <ul>
+            <li>Transformo problemas em processos.</li>
+            <li>Transformo experiência em aprendizado.</li>
+            <li>Transformo aprendizado em resultado.</li>
+            <li>Construo operações mais eficientes, escaláveis e humanas.</li>
+          </ul>
+        </article>
+
+        <article class="card pressure">
+          <h2>Como eu lido com pressão</h2>
+          <p>A pressão não me define. Ela revela minha preparação.</p>
+          <p>Eu respiro, observo, priorizo, decido e executo. Em situações hostis, eu me posiciono sem perder o centro.</p>
+        </article>
+
+        <article class="card life">
+          <h2>O que prospera comigo</h2>
+          <ul>
+            <li>Minha carreira prospera comigo.</li>
+            <li>Meu lar prospera comigo.</li>
+            <li>Meu relacionamento prospera comigo.</li>
+            <li>Minha família é abençoada pelo que eu construo.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="wide">
+        <div class="manifesto">
+          <h2>Meu compromisso</h2>
+          <p>Eu sou compromissada com meu sucesso.</p>
+          <p>Eu medito e não abro mão do meu centro.</p>
+          <p>Eu sei dosar energia entre vida pessoal e trabalho.</p>
+          <p>Eu abandono o que me impede de crescer e tenho disposição de pagar o preço da vida que escolhi construir.</p>
+        </div>
+
+        <div class="pillars">
+          <h2>Meus pilares</h2>
+          <div class="pillar-list">
+            <div class="pillar"><span class="dot" style="--dot:#6f2437"></span>Foco em objetivos, não em oscilação emocional.</div>
+            <div class="pillar"><span class="dot" style="--dot:#a8552a"></span>Comunicação clara, racional e posicionada.</div>
+            <div class="pillar"><span class="dot" style="--dot:#476b4f"></span>Liderança humana, didática e firme.</div>
+            <div class="pillar"><span class="dot" style="--dot:#365a6d"></span>Processos, indicadores e melhoria contínua.</div>
+            <div class="pillar"><span class="dot" style="--dot:#5b3b63"></span>Coragem para ser mal compreendida e seguir o caminho correto.</div>
+            <div class="pillar"><span class="dot" style="--dot:#c9954a"></span>Prosperidade financeira, emocional, profissional e familiar.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="quote-bottom">
+        <p>Eu sou referência no que faço.</p>
+        <span>Não porque nunca erro, mas porque aprendo, sustento responsabilidade e entrego.</span>
+      </section>
+    </main>
+
+    <footer>
+      Canvas pessoal de identidade, liderança e prosperidade — para reler antes de decisões importantes, entrevistas e ciclos de crescimento.
+    </footer>
+  </div>
+</body>
+</html>
